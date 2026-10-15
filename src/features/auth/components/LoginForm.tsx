@@ -1,0 +1,76 @@
+import { useState, type ComponentProps } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { authApi } from '../api/authApi';
+import { useAuth } from '../context/AuthContext';
+
+export default function LoginForm() {
+    const navigate = useNavigate();
+    const { saveSession } = useAuth();
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    type FormSubmitHandler = NonNullable<
+        ComponentProps<'form'>['onSubmit']
+    >;
+
+    async function handleSubmit(
+        event: Parameters<FormSubmitHandler>[0],
+    ) {
+        event.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            const response = await authApi.login({ email, password });
+            saveSession(response);
+            navigate('/users');
+        } catch (err) {
+            setError(
+                err instanceof Error ? err.message : 'Ошибка входа',
+            );
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <h1>Вход</h1>
+
+            <label>
+                Email
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    required
+                    autoComplete="email"
+                />
+            </label>
+
+            <label>
+                Пароль
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                    autoComplete="current-password"
+                />
+            </label>
+
+            {error && <p role="alert">{error}</p>}
+
+            <button type="submit" disabled={loading}>
+                {loading ? 'Вход...' : 'Войти'}
+            </button>
+
+            <p>
+                Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+            </p>
+        </form>
+    );
+}
