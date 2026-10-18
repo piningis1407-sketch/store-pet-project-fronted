@@ -1,77 +1,86 @@
+
 const API_URL = (
     import.meta.env.VITE_API_URL ?? 'http://localhost:8082'
 ).replace(/\/$/, '');
 
+let accessToken: string | null = null;
+let tokenType = 'Bearer';
+
 let refreshPromise: Promise<string | null> | null = null;
 
-function clearSession(): void {
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('refreshToken');
-    sessionStorage.removeItem('tokenType');
+export function setAccessToken(
+    token: string | null,
+    type = 'Bearer',
+): void {
+    accessToken = token;
+    tokenType = type;
 }
 
-function redirectToLogin(): void {
-    if (
-        window.location.pathname !== '/login' &&
-        window.location.pathname !== '/register'
-    ) {
-        window.location.assign('/login');
-    }
+export function getAccessToken(): string | null {
+    return accessToken;
 }
 
-async function refreshAccessToken(): Promise<string | null> {
-    // Если несколько запросов одновременно получили 401,
-    // выполняем только одно обновление токена.
+/**
+ * Единая функция обновления access-токена.
+ * Все одновременные вызовы ожидают один и тот же запрос.
+ */
+export function refreshAccessToken(): Promise<string | null> {
     if (refreshPromise) {
         return refreshPromise;
     }
 
-    refreshPromise = (async () => {
-        const refreshToken = sessionStorage.getItem('refreshToken');
-
-        if (!refreshToken) {
-            clearSession();
-            redirectToLogin();
-            return null;
-        }
-
+    refreshPromise = (async (): Promise<string | null> => {
         try {
-            const response = await fetch(`${API_URL}/api/auth/refresh`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            const response = await fetch(
+                `${API_URL}/api/auth/refresh`,
+                {
+                    method: 'POST',
+                    credentials: 'include',
                 },
-                body: JSON.stringify({ refreshToken }),
-            });
+            );
 
             if (!response.ok) {
-                clearSession();
-                redirectToLogin();
+                if (
+                    response.status === 401 ||
+                    response.status === 403
+                ) {
+                    setAccessToken(null);
+
+                    window.dispatchEvent(
+                        new Event('auth:session-expired'),
+                    );
+                }
+
                 return null;
             }
 
             const data: {
                 accessToken: string;
-                refreshToken: string;
                 tokenType: string;
             } = await response.json();
 
-            if (!data.accessToken || !data.refreshToken) {
-                clearSession();
-                redirectToLogin();
+            if (!data.accessToken) {
+                setAccessToken(null);
+
+                window.dispatchEvent(
+                    new Event('auth:session-expired'),
+                );
+
                 return null;
             }
 
-            sessionStorage.setItem('accessToken', data.accessToken);
-            sessionStorage.setItem('refreshToken', data.refreshToken);
-            sessionStorage.setItem('tokenType', data.tokenType || 'Bearer');
+            setAccessToken(
+                data.accessToken,
+                data.tokenType || 'Bearer',
+            );
 
-            window.dispatchEvent(new Event('auth:token-refreshed'));
+            window.dispatchEvent(
+                new Event('auth:token-refreshed'),
+            );
 
             return data.accessToken;
         } catch {
-            clearSession();
-            redirectToLogin();
+            // При сетевой ошибке не объявляем сессию завершённой.
             return null;
         } finally {
             refreshPromise = null;
@@ -85,6 +94,13 @@ export async function apiRequest<T>(
     path: string,
     options: RequestInit = {},
 ): Promise<T> {
+    const isAuthEndpoint = [
+        '/api/auth/login',
+        '/api/auth/register',
+        '/api/auth/refresh',
+        '/api/auth/logout',
+    ].includes(path);
+
     const sendRequest = (token: string | null) => {
         const headers = new Headers(options.headers);
 
@@ -97,9 +113,6 @@ export async function apiRequest<T>(
         }
 
         if (token) {
-            const tokenType =
-                sessionStorage.getItem('tokenType') || 'Bearer';
-
             headers.set('Authorization', `${tokenType} ${token}`);
         } else {
             headers.delete('Authorization');
@@ -107,31 +120,27 @@ export async function apiRequest<T>(
 
         return fetch(`${API_URL}${path}`, {
             ...options,
+            credentials: 'include',
             headers,
         });
     };
 
-    const isAuthEndpoint = [
-        '/api/auth/login',
-        '/api/auth/register',
-        '/api/auth/refresh',
-        '/api/auth/logout',
-    ].includes(path);
-
-    let token = sessionStorage.getItem('accessToken');
-    let response = await sendRequest(token);
+    let response = await sendRequest(getAccessToken());
 
     if (response.status === 401 && !isAuthEndpoint) {
-        token = await refreshAccessToken();
+        const newToken = await refreshAccessToken();
 
-        if (token) {
-            response = await sendRequest(token);
+        if (newToken) {
+            response = await sendRequest(newToken);
         }
     }
 
     if (!response.ok) {
         const message = await response.text();
-        throw new Error(message || `HTTP error: ${response.status}`);
+
+        throw new Error(
+            message || `HTTP error: ${response.status}`,
+        );
     }
 
     if (response.status === 204) {

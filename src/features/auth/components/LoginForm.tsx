@@ -1,7 +1,12 @@
 import { useState, type ComponentProps } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { authApi } from '../api/authApi';
 import { useAuth } from '../context/AuthContext';
+
+type FormSubmitHandler = NonNullable<
+    ComponentProps<'form'>['onSubmit']
+>;
 
 export default function LoginForm() {
     const navigate = useNavigate();
@@ -12,24 +17,37 @@ export default function LoginForm() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    type FormSubmitHandler = NonNullable<
-        ComponentProps<'form'>['onSubmit']
-    >;
-
     async function handleSubmit(
         event: Parameters<FormSubmitHandler>[0],
     ) {
         event.preventDefault();
         setError('');
+
+        const normalizedEmail = email.trim();
+
+        if (!normalizedEmail || !password) {
+            setError('Введите email и пароль.');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            const response = await authApi.login({ email, password });
+            const response = await authApi.login({
+                email: normalizedEmail,
+                password,
+            });
+
+            // Сохраняем accessToken в памяти.
+            // refreshToken устанавливается backend в HttpOnly Cookie.
             saveSession(response);
-            navigate('/users');
+
+            navigate('/users', { replace: true });
         } catch (err) {
             setError(
-                err instanceof Error ? err.message : 'Ошибка входа',
+                err instanceof Error
+                    ? err.message
+                    : 'Ошибка входа',
             );
         } finally {
             setLoading(false);
@@ -69,7 +87,8 @@ export default function LoginForm() {
             </button>
 
             <p>
-                Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+                Нет аккаунта?{' '}
+                <Link to="/register">Зарегистрироваться</Link>
             </p>
         </form>
     );

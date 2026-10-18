@@ -1,7 +1,12 @@
 import { useState, type ComponentProps } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { authApi } from '../api/authApi';
 import { useAuth } from '../context/AuthContext';
+
+type FormSubmitHandler = NonNullable<
+    ComponentProps<'form'>['onSubmit']
+>;
 
 export default function RegisterForm() {
     const navigate = useNavigate();
@@ -13,10 +18,6 @@ export default function RegisterForm() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    type FormSubmitHandler = NonNullable<
-        ComponentProps<'form'>['onSubmit']
-    >;
-
     async function handleSubmit(
         event: Parameters<FormSubmitHandler>[0],
     ) {
@@ -27,7 +28,9 @@ export default function RegisterForm() {
         const normalizedEmail = email.trim();
 
         if (!normalizedName || normalizedName.length > 30) {
-            setError('Имя обязательно и должно содержать не более 30 символов.');
+            setError(
+                'Имя обязательно и должно содержать не более 30 символов.',
+            );
             return;
         }
 
@@ -50,8 +53,11 @@ export default function RegisterForm() {
                 password,
             });
 
+            // Сохраняется только accessToken в памяти.
+            // refreshToken браузер получает в HttpOnly Cookie.
             saveSession(response);
-            navigate('/users');
+
+            navigate('/users', { replace: true });
         } catch (err) {
             setError(
                 err instanceof Error

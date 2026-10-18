@@ -1,3 +1,4 @@
+
 import {
     createContext,
     useContext,
@@ -5,57 +6,112 @@ import {
     useEffect,
     type ReactNode,
 } from 'react';
+
 import type { AuthResponse } from '../types/auth.types';
-import {authApi} from "../api/authApi";
+import { authApi } from '../api/authApi';
+import {
+    getAccessToken,
+    setAccessToken,
+    refreshAccessToken,
+} from '../../../shared/api/http';
 
 interface AuthContextValue {
     isAuthenticated: boolean;
+    isLoading: boolean;
     accessToken: string | null;
     saveSession: (data: AuthResponse) => void;
-    logout: () => void;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [accessToken, setAccessToken] = useState<string | null>(
-        () => sessionStorage.getItem('accessToken'),
+    const [accessToken, setTokenState] = useState<string | null>(
+        () => getAccessToken(),
     );
 
+    const [isLoading, setIsLoading] = useState(true);
+
+    const updateAccessToken = (
+        token: string | null,
+        type = 'Bearer',
+    ) => {
+        setAccessToken(token, type);
+        setTokenState(token);
+    };
+
     useEffect(() => {
-        const syncToken = () => {
-            setAccessToken(sessionStorage.getItem('accessToken'));
+        let active = true;
+
+        const handleTokenRefreshed = () => {
+            if (active) {
+                setTokenState(getAccessToken());
+            }
         };
 
-        window.addEventListener('auth:token-refreshed', syncToken);
+        const handleSessionExpired = () => {
+            if (active) {
+                setTokenState(null);
+            }
+        };
+
+        window.addEventListener(
+            'auth:token-refreshed',
+            handleTokenRefreshed,
+        );
+
+        window.addEventListener(
+            'auth:session-expired',
+            handleSessionExpired,
+        );
+
+        const restoreSession = async () => {
+            try {
+                // Использует общий refreshPromise из http.ts.
+                await refreshAccessToken();
+
+                if (active) {
+                    setTokenState(getAccessToken());
+                }
+            } finally {
+                if (active) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        void restoreSession();
 
         return () => {
-            window.removeEventListener('auth:token-refreshed', syncToken);
+            active = false;
+
+            window.removeEventListener(
+                'auth:token-refreshed',
+                handleTokenRefreshed,
+            );
+
+            window.removeEventListener(
+                'auth:session-expired',
+                handleSessionExpired,
+            );
         };
     }, []);
 
     const saveSession = (data: AuthResponse) => {
-        sessionStorage.setItem('accessToken', data.accessToken);
-        sessionStorage.setItem('refreshToken', data.refreshToken);
-        sessionStorage.setItem('tokenType', data.tokenType);
-        setAccessToken(data.accessToken);
+        updateAccessToken(
+            data.accessToken,
+            data.tokenType || 'Bearer',
+        );
     };
 
     const logout = async (): Promise<void> => {
-        const refreshToken = sessionStorage.getItem('refreshToken');
-
         try {
-            if (refreshToken) {
-                await authApi.logout(refreshToken);
-            }
+            // Refresh-токен браузер отправляет в HttpOnly cookie.
+            await authApi.logout();
         } catch (error) {
             console.error('Backend logout failed:', error);
         } finally {
-            sessionStorage.removeItem('accessToken');
-            sessionStorage.removeItem('refreshToken');
-            sessionStorage.removeItem('tokenType');
-
-            setAccessToken(null);
+            updateAccessToken(null);
             window.location.assign('/login');
         }
     };
@@ -64,6 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         <AuthContext.Provider
             value={{
                 isAuthenticated: Boolean(accessToken),
+                isLoading,
                 accessToken,
                 saveSession,
                 logout,
@@ -78,7 +135,9 @@ export function useAuth() {
     const context = useContext(AuthContext);
 
     if (!context) {
-        throw new Error('useAuth must be used inside AuthProvider');
+        throw new Error(
+            'useAuth must be used inside AuthProvider',
+        );
     }
 
     return context;
