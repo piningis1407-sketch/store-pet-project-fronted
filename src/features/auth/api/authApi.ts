@@ -27,4 +27,14 @@ export const authApi = {
             body: JSON.stringify(data),
         });
     },
+
+    logout(refreshToken: string): Promise<void> {
+        return apiRequest<void>('/api/auth/logout', {
+            method: 'POST',
+            body: JSON.stringify({ refreshToken }),
+        });
+    },
+
+
 };
+
