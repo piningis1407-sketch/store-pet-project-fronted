@@ -8,11 +8,12 @@ import RegisterPage from '../features/auth/pages/RegisterPage';
 import UsersPage from '../features/users/pages/UsersPage';
 import UserDetailsPage from '../features/users/pages/UserDetailsPage';
 import ProtectedRoute from '../shared/components/ProtectedRoute';
+import { ProductsPage } from '../features/products/pages/ProductsPage';
 
 export const router = createBrowserRouter([
     {
         path: '/',
-        element: <Navigate to="/users" replace />,
+        element: <Navigate to="/products" replace />,
     },
     {
         path: '/login',
@@ -21,6 +22,10 @@ export const router = createBrowserRouter([
     {
         path: '/register',
         element: <RegisterPage />,
+    },
+    {
+        path: '/products',
+        element: <ProductsPage />,
     },
     {
         element: <ProtectedRoute />,
@@ -33,6 +38,7 @@ export const router = createBrowserRouter([
                 path: '/users/:id',
                 element: <UserDetailsPage />,
             },
+
         ],
     },
 ]);
