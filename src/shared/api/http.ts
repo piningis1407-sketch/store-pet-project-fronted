@@ -1,3 +1,4 @@
+import { getRussianApiError } from './errorMessages';
 
 const API_URL = (
     import.meta.env.VITE_API_URL ?? 'http://localhost:8082'
@@ -125,21 +126,51 @@ export async function apiRequest<T>(
         });
     };
 
-    let response = await sendRequest(getAccessToken());
+    let response: Response;
+
+    try {
+        response = await sendRequest(getAccessToken());
+    } catch (error) {
+        if (
+            error instanceof TypeError ||
+            (error instanceof Error &&
+                /failed to fetch|networkerror|load failed/i.test(error.message))
+        ) {
+            throw new Error(
+                'Не удалось связаться с сервером. Проверьте подключение и убедитесь, что backend запущен.',
+            );
+        }
+
+        throw error;
+    }
 
     if (response.status === 401 && !isAuthEndpoint) {
         const newToken = await refreshAccessToken();
 
         if (newToken) {
-            response = await sendRequest(newToken);
+            try {
+                response = await sendRequest(newToken);
+            } catch (error) {
+                if (
+                    error instanceof TypeError ||
+                    (error instanceof Error &&
+                        /failed to fetch|networkerror|load failed/i.test(error.message))
+                ) {
+                    throw new Error(
+                        'Не удалось связаться с сервером. Проверьте подключение и убедитесь, что backend запущен.',
+                    );
+                }
+
+                throw error;
+            }
         }
     }
 
     if (!response.ok) {
-        const message = await response.text();
+        const body = await response.text();
 
         throw new Error(
-            message || `HTTP error: ${response.status}`,
+            getRussianApiError(body, response.status, path),
         );
     }
 
@@ -149,3 +180,4 @@ export async function apiRequest<T>(
 
     return response.json() as Promise<T>;
 }
+

@@ -1,8 +1,8 @@
 import { useState, type ComponentProps } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
 import { authApi } from '../api/authApi';
 import { useAuth } from '../context/AuthContext';
+import { getRussianErrorMessage } from '../../../shared/api/errorMessages';
 
 type FormSubmitHandler = NonNullable<
     ComponentProps<'form'>['onSubmit']
@@ -44,11 +44,7 @@ export default function LoginForm() {
 
             navigate('/users', { replace: true });
         } catch (err) {
-            setError(
-                err instanceof Error
-                    ? err.message
-                    : 'Ошибка входа',
-            );
+            setError(getRussianErrorMessage(err));
         } finally {
             setLoading(false);
         }

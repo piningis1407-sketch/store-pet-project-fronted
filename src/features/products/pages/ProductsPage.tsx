@@ -3,6 +3,7 @@ import { getProducts } from '../api/productApi';
 import { getCategories } from '../api/categoriesApi';
 import type { Category, ProductPage } from '../types/product';
 import { ProductCard } from '../components/ProductCard';
+import { getRussianErrorMessage } from '../../../shared/api/errorMessages';
 import '../products.css';
 
 type SortOption =
@@ -35,9 +36,9 @@ export function ProductsPage() {
                     setCategories(result);
                     setCategoriesError(null);
                 }
-            } catch {
+            } catch(err) {
                 if (!cancelled) {
-                    setCategoriesError('Не удалось загрузить категории.');
+                    setError(getRussianErrorMessage(err));
                 }
             }
         }

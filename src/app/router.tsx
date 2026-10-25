@@ -9,6 +9,7 @@ import UsersPage from '../features/users/pages/UsersPage';
 import UserDetailsPage from '../features/users/pages/UserDetailsPage';
 import ProtectedRoute from '../shared/components/ProtectedRoute';
 import { ProductsPage } from '../features/products/pages/ProductsPage';
+import { ProductDetailsPage } from '../features/products/pages/ProductDetailsPage';
 
 export const router = createBrowserRouter([
     {
@@ -26,6 +27,10 @@ export const router = createBrowserRouter([
     {
         path: '/products',
         element: <ProductsPage />,
+    },
+    {
+        path: '/products/:id',
+        element: <ProductDetailsPage />,
     },
     {
         element: <ProtectedRoute />,
