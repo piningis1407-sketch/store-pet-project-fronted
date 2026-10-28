@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getProductById } from '../api/productApi';
 import type { Product } from '../types/product';
 import { getRussianErrorMessage } from '../../../shared/api/errorMessages';
 import '../product-details.css';
+
+
 
 const priceFormatter = new Intl.NumberFormat('ru-RU', {
     style: 'currency',
@@ -13,7 +15,15 @@ const priceFormatter = new Intl.NumberFormat('ru-RU', {
 
 export function ProductDetailsPage() {
     const { id } = useParams<{ id: string }>();
+    const location = useLocation();
+    const navigate = useNavigate();
 
+    const returnTo =
+        (location.state as { from?: string } | null)?.from ?? '/products';
+
+    function goBackToCatalog() {
+        navigate(returnTo);
+    }
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -72,9 +82,13 @@ export function ProductDetailsPage() {
     if (error || !product) {
         return (
             <main className="product-details">
-                <Link className="product-details__back" to="/products">
+                <button
+                    type="button"
+                    className="product-details__back"
+                    onClick={goBackToCatalog}
+                >
                     ← Назад в каталог
-                </Link>
+                </button>
 
                 <h1>
                     {error?.includes('Товар не найден')
@@ -101,9 +115,13 @@ export function ProductDetailsPage() {
 
     return (
         <main className="product-details">
-            <Link className="product-details__back" to="/products">
+            <button
+                type="button"
+                className="product-details__back"
+                onClick={goBackToCatalog}
+            >
                 ← Назад в каталог
-            </Link>
+            </button>
 
             <article className="product-details__layout">
                 <div className="product-details__media">
@@ -165,12 +183,13 @@ export function ProductDetailsPage() {
                         Артикул: {product.id}
                     </p>
 
-                    <Link
+                    <button
+                        type="button"
                         className="product-details__catalog-link"
-                        to="/products"
+                        onClick={goBackToCatalog}
                     >
                         Продолжить просмотр каталога
-                    </Link>
+                    </button>
                 </div>
             </article>
         </main>

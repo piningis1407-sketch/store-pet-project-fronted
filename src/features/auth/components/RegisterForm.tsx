@@ -57,7 +57,7 @@ export default function RegisterForm() {
             // refreshToken браузер получает в HttpOnly Cookie.
             saveSession(response);
 
-            navigate('/users', { replace: true });
+            navigate('/products', { replace: true });
         } catch (err) {
             setError(getRussianErrorMessage(err));
         } finally {
@@ -68,6 +68,9 @@ export default function RegisterForm() {
     return (
         <form onSubmit={handleSubmit}>
             <h1>Регистрация</h1>
+            <p className="auth-card__subtitle">
+                Создайте аккаунт в нашем магазине.
+            </p>
 
             <label>
                 Имя
@@ -77,6 +80,7 @@ export default function RegisterForm() {
                     maxLength={30}
                     required
                     autoComplete="name"
+                    placeholder="Ваше имя"
                 />
             </label>
 
@@ -88,6 +92,7 @@ export default function RegisterForm() {
                     onChange={(event) => setEmail(event.target.value)}
                     required
                     autoComplete="email"
+                    placeholder="you@example.com"
                 />
             </label>
 
@@ -101,18 +106,24 @@ export default function RegisterForm() {
                     maxLength={72}
                     required
                     autoComplete="new-password"
+                    placeholder="Не менее 8 символов"
                 />
             </label>
 
-            {error && <p role="alert">{error}</p>}
+            {error && (
+                <p className="auth-card__error" role="alert">
+                    {error}
+                </p>
+            )}
 
             <button type="submit" disabled={loading}>
                 {loading ? 'Регистрация...' : 'Зарегистрироваться'}
             </button>
 
-            <p>
-                Уже есть аккаунт? <Link to="/login">Войти</Link>
+            <p className="auth-card__footer">
+                Уже есть аккаунт? {' '}<Link to="/login">Войти</Link>
             </p>
         </form>
+
     );
 }

@@ -9,6 +9,7 @@ export interface ProductQuery {
     size: number;
     sort: 'name,asc' | 'price,asc' | 'price,desc' | 'createdAt,desc';
     categoryId?: number;
+    search?: string;
 }
 
 export async function getProducts(
@@ -22,6 +23,10 @@ export async function getProducts(
 
     if (query.categoryId !== undefined) {
         params.set('categoryId', String(query.categoryId));
+    }
+
+    if (query.search?.trim()) {
+        params.set('search', query.search.trim());
     }
 
     return apiRequest<ProductPage>(

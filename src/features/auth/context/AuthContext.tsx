@@ -112,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Backend logout failed:', error);
         } finally {
             updateAccessToken(null);
-            window.location.assign('/login');
+            window.location.assign('/products');
         }
     };
 

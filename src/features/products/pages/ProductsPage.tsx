@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getProducts } from '../api/productApi';
 import { getCategories } from '../api/categoriesApi';
@@ -24,31 +25,8 @@ export function ProductsPage() {
     const [categoriesError, setCategoriesError] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [reloadKey, setReloadKey] = useState(0);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        async function loadCategories() {
-            try {
-                const result = await getCategories();
-
-                if (!cancelled) {
-                    setCategories(result);
-                    setCategoriesError(null);
-                }
-            } catch(err) {
-                if (!cancelled) {
-                    setError(getRussianErrorMessage(err));
-                }
-            }
-        }
-
-        void loadCategories();
-
-        return () => {
-            cancelled = true;
-        };
-    }, []);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const search = searchParams.get('search')?.trim() ?? '';
 
     useEffect(() => {
         let cancelled = false;
@@ -59,10 +37,11 @@ export function ProductsPage() {
 
             try {
                 const result = await getProducts({
-                    page,
+                    page: search ? 0 : page,
                     size: PAGE_SIZE,
                     sort,
                     ...(categoryId ? { categoryId: Number(categoryId) } : {}),
+                    ...(search.length > 0 ? { search } : {}),
                 });
 
                 if (!cancelled) {
@@ -70,11 +49,7 @@ export function ProductsPage() {
                 }
             } catch (err) {
                 if (!cancelled) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : 'Не удалось загрузить каталог',
-                    );
+                    setError(getRussianErrorMessage(err));
                 }
             } finally {
                 if (!cancelled) {
@@ -88,7 +63,37 @@ export function ProductsPage() {
         return () => {
             cancelled = true;
         };
-    }, [page, sort, categoryId, reloadKey]);
+    }, [page, sort, categoryId, search, reloadKey]);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadCategories() {
+            setCategoriesError(null);
+
+            try {
+                const result = await getCategories();
+
+                if (!cancelled) {
+                    setCategories(result);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setCategoriesError(getRussianErrorMessage(err));
+                }
+            }
+        }
+
+        void loadCategories();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        setPage(0);
+    }, [search]);
 
     function changeSort(value: SortOption) {
         setSort(value);

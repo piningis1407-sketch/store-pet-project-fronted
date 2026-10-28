@@ -42,7 +42,7 @@ export default function LoginForm() {
             // refreshToken устанавливается backend в HttpOnly Cookie.
             saveSession(response);
 
-            navigate('/users', { replace: true });
+            navigate('/products', { replace: true });
         } catch (err) {
             setError(getRussianErrorMessage(err));
         } finally {
@@ -53,6 +53,9 @@ export default function LoginForm() {
     return (
         <form onSubmit={handleSubmit}>
             <h1>Вход</h1>
+            <p className="auth-card__subtitle">
+                Войдите в аккаунт, чтобы продолжить.
+            </p>
 
             <label>
                 Email
@@ -62,6 +65,7 @@ export default function LoginForm() {
                     onChange={(event) => setEmail(event.target.value)}
                     required
                     autoComplete="email"
+                    placeholder="you@example.com"
                 />
             </label>
 
@@ -73,19 +77,25 @@ export default function LoginForm() {
                     onChange={(event) => setPassword(event.target.value)}
                     required
                     autoComplete="current-password"
+                    placeholder="Введите пароль"
                 />
             </label>
 
-            {error && <p role="alert">{error}</p>}
+            {error && (
+                <p className="auth-card__error" role="alert">
+                    {error}
+                </p>
+            )}
 
             <button type="submit" disabled={loading}>
                 {loading ? 'Вход...' : 'Войти'}
             </button>
 
-            <p>
+            <p className="auth-card__footer">
                 Нет аккаунта?{' '}
                 <Link to="/register">Зарегистрироваться</Link>
             </p>
         </form>
+
     );
 }
