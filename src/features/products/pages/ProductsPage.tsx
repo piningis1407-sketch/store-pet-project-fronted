@@ -15,18 +15,80 @@ type SortOption =
 
 const PAGE_SIZE = 12;
 
+const SORT_OPTIONS: SortOption[] = [
+    'name,asc',
+    'price,asc',
+    'price,desc',
+    'createdAt,desc',
+];
+
+function parsePage(value: string | null): number {
+    if (!value || !/^\d+$/.test(value)) {
+        return 0;
+    }
+
+    const parsed = Number(value);
+
+    return Number.isSafeInteger(parsed) ? parsed : 0;
+
+}
+
+function parseSort(value: string | null): SortOption {
+    return SORT_OPTIONS.includes(value as SortOption)
+        ? (value as SortOption)
+        : 'name,asc';
+}
+
 export function ProductsPage() {
     const [data, setData] = useState<ProductPage | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [categoryId, setCategoryId] = useState('');
-    const [page, setPage] = useState(0);
-    const [sort, setSort] = useState<SortOption>('name,asc');
     const [loading, setLoading] = useState(true);
     const [categoriesError, setCategoriesError] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [reloadKey, setReloadKey] = useState(0);
+
     const [searchParams, setSearchParams] = useSearchParams();
+
     const search = searchParams.get('search')?.trim() ?? '';
+    const page = parsePage(searchParams.get('page'));
+    const sort = parseSort(searchParams.get('sort'));
+    const categoryId = searchParams.get('categoryId') ?? '';
+
+    function updateCatalogParams(updates: Record<string, string>) {
+        setSearchParams(current => {
+            const next = new URLSearchParams(current);
+
+            for (const [key, value] of Object.entries(updates)) {
+                if (value) {
+                    next.set(key, value);
+                } else {
+                    next.delete(key);
+                }
+            }
+
+            return next;
+        });
+    }
+
+    function changeSort(value: SortOption) {
+        updateCatalogParams({
+            sort: value === 'name,asc' ? '' : value,
+            page: '',
+        });
+    }
+
+    function changeCategory(value: string) {
+        updateCatalogParams({
+            categoryId: value,
+            page: '',
+        });
+    }
+
+    function changePage(value: number) {
+        updateCatalogParams({
+            page: value === 0 ? '' : String(value),
+        });
+    }
 
     useEffect(() => {
         let cancelled = false;
@@ -40,8 +102,10 @@ export function ProductsPage() {
                     page: search ? 0 : page,
                     size: PAGE_SIZE,
                     sort,
-                    ...(categoryId ? { categoryId: Number(categoryId) } : {}),
-                    ...(search.length > 0 ? { search } : {}),
+                    ...(categoryId && /^\d+$/.test(categoryId)
+                        ? { categoryId: Number(categoryId) }
+                        : {}),
+                    ...(search ? { search } : {}),
                 });
 
                 if (!cancelled) {
@@ -90,20 +154,6 @@ export function ProductsPage() {
             cancelled = true;
         };
     }, []);
-
-    useEffect(() => {
-        setPage(0);
-    }, [search]);
-
-    function changeSort(value: SortOption) {
-        setSort(value);
-        setPage(0);
-    }
-
-    function changeCategory(value: string) {
-        setCategoryId(value);
-        setPage(0);
-    }
 
     return (
         <main className="products-page">
@@ -155,7 +205,10 @@ export function ProductsPage() {
             ) : error ? (
                 <section>
                     <p role="alert">{error}</p>
-                    <button onClick={() => setReloadKey(value => value + 1)}>
+                    <button
+                        type="button"
+                        onClick={() => setReloadKey(value => value + 1)}
+                    >
                         Повторить загрузку
                     </button>
                 </section>
@@ -179,22 +232,18 @@ export function ProductsPage() {
                         >
                             <button
                                 disabled={data.first}
-                                onClick={() =>
-                                    setPage(current => current - 1)
-                                }
+                                onClick={() => changePage(page - 1)}
                             >
                                 Назад
                             </button>
 
                             <span>
-                                Страница {data.number + 1} из {data.totalPages}
-                            </span>
+                            Страница {data.number + 1} из {data.totalPages}
+                        </span>
 
                             <button
                                 disabled={data.last}
-                                onClick={() =>
-                                    setPage(current => current + 1)
-                                }
+                                onClick={() => changePage(page + 1)}
                             >
                                 Далее
                             </button>
@@ -204,4 +253,5 @@ export function ProductsPage() {
             )}
         </main>
     );
+
 }

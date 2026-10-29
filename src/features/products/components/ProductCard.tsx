@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Product } from '../types/product';
-import { Link } from 'react-router-dom';
+import { Link,  useLocation  } from 'react-router-dom';
 
 interface ProductCardProps {
     product: Product;
@@ -14,15 +14,16 @@ const priceFormatter = new Intl.NumberFormat('ru-RU', {
 
 export function ProductCard({ product }: ProductCardProps) {
     const [imageError, setImageError] = useState(false);
-
+    const location = useLocation();
     const hasImage = Boolean(product.imageUrl) && !imageError;
     const inStock = product.stockQuantity > 0;
-
+    const currentCatalogUrl = location.pathname + location.search;
     return (
         <article className="product-card">
             <Link
                 className="product-card__link"
                 to={`/products/${product.id}`}
+                state={{ from: currentCatalogUrl }}
                 aria-label={`Подробнее о товаре: ${product.name}`}
             >
                 <div className="product-card__media">
