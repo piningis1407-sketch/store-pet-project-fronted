@@ -40,6 +40,8 @@
     border-radius: 2px;
 }
 
+/* Навигация */
+
 .site-header__nav {
     display: flex;
     align-items: center;
@@ -60,6 +62,7 @@
     border-radius: 6px;
     background: transparent;
     cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease;
 }
 
 .site-header__nav a:hover,
@@ -74,12 +77,15 @@
     color: #29251f;
 }
 
+/* Поиск */
+
 .site-header__search {
     display: flex;
     align-items: center;
     gap: 8px;
     flex: 1;
     max-width: 420px;
+    min-width: 180px;
     margin: 0 24px;
 }
 
@@ -103,25 +109,142 @@
     color: #fff;
     font: inherit;
     cursor: pointer;
+    transition: background 0.2s ease;
 }
 
 .site-header__search button:hover {
     background: #5f452d;
 }
 
+/* Пользователь */
+
+.site-header__user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    max-width: 190px;
+    padding: 4px 0;
+}
+
+.site-header__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 36px;
+    height: 36px;
+
+    color: #29251f;
+    background: #c9a878;
+    border-radius: 50%;
+}
+
+.site-header__avatar svg {
+    width: 20px;
+    height: 20px;
+}
+
+.site-header__user-name {
+    overflow: hidden;
+    color: #e8c99b;
+    font-size: 14px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Кнопка выхода */
+
+.site-header__logout {
+    white-space: nowrap;
+    border-left: 1px solid rgba(201, 177, 141, 0.35) !important;
+    border-radius: 0 !important;
+    padding-left: 20px !important;
+}
+
+.site-header__logout:hover {
+    color: #e8c99b;
+}
+
+.site-header__nav button.site-header__logout {
+    padding: 8px 0 8px 20px;
+    border: none !important;
+    border-left: 1px solid rgba(201, 177, 141, 0.35) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.site-header__nav button.site-header__logout:hover {
+    color: #e8c99b;
+}
+/* Адаптивность */
+
+@media (max-width: 900px) {
+    .site-header {
+        gap: 16px;
+    }
+
+    .site-header__search {
+        margin: 0 8px;
+    }
+
+    .site-header__nav {
+        gap: 12px;
+    }
+}
+
 @media (max-width: 700px) {
     .site-header {
         flex-wrap: wrap;
+        gap: 14px;
     }
 
     .site-header__search {
         order: 3;
         flex-basis: 100%;
         max-width: none;
-        margin: 8px 0 0;
+        margin: 4px 0 0;
     }
 
     .site-header__nav {
         flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .site-header__user {
+        max-width: 130px;
+    }
+
+    .site-header__user-name {
+        max-width: 85px;
+    }
+}
+
+@media (max-width: 420px) {
+    .site-header {
+        padding: 14px 4%;
+    }
+
+    .site-header__logo {
+        font-size: 1.35rem;
+    }
+
+    .site-header__nav {
+        gap: 8px;
+    }
+
+    .site-header__avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .site-header__logout {
+        padding-left: 10px !important;
     }
 }

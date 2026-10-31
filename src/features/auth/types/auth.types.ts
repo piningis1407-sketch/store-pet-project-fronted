@@ -13,3 +13,8 @@ export interface AuthResponse {
     accessToken: string;
     tokenType: string;
 }
+
+export interface UserProfileResponse {
+    name: string;
+    email: string;
+}

@@ -3,6 +3,7 @@ import type {
     AuthResponse,
     LoginRequest,
     RegisterRequest,
+    UserProfileResponse,
 } from '../types/auth.types';
 
 export const authApi = {
@@ -18,6 +19,10 @@ export const authApi = {
             method: 'POST',
             body: JSON.stringify(data),
         });
+    },
+
+    getCurrentUserProfile(): Promise<UserProfileResponse> {
+        return apiRequest<UserProfileResponse>('/api/auth/me');
     },
 
     logout(): Promise<void> {

@@ -4,6 +4,7 @@ import {
     useContext,
     useState,
     useEffect,
+    useRef,
     type ReactNode,
 } from 'react';
 
@@ -19,6 +20,7 @@ interface AuthContextValue {
     isAuthenticated: boolean;
     isLoading: boolean;
     accessToken: string | null;
+    userName: string | null;
     saveSession: (data: AuthResponse) => void;
     logout: () => Promise<void>;
 }
@@ -29,9 +31,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [accessToken, setTokenState] = useState<string | null>(
         () => getAccessToken(),
     );
-
+    const [userName, setUserName] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Не позволяем устаревшему запросу профиля восстановить имя
+    // после выхода из аккаунта или нового входа.
+    const profileRequestId = useRef(0);
     const updateAccessToken = (
         token: string | null,
         type = 'Bearer',
@@ -39,6 +44,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAccessToken(token, type);
         setTokenState(token);
     };
+
+    async function loadUserProfile(): Promise<void> {
+        const token = getAccessToken();
+
+        if (!token) {
+            setUserName(null);
+            return;
+        }
+
+        const requestId = ++profileRequestId.current;
+
+        try {
+            const profile = await authApi.getCurrentUserProfile();
+
+            if (
+                requestId === profileRequestId.current &&
+                getAccessToken() !== null
+            ) {
+                setUserName(profile.name);
+            }
+        } catch (error) {
+            if (requestId === profileRequestId.current) {
+                setUserName(null);
+            }
+
+            console.error('Failed to load user profile:', error);
+        }
+    }
 
     useEffect(() => {
         let active = true;
@@ -50,9 +83,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
 
         const handleSessionExpired = () => {
-            if (active) {
-                setTokenState(null);
-            }
+            profileRequestId.current++;
+            setTokenState(null);
+            setUserName(null);
         };
 
         window.addEventListener(
@@ -68,10 +101,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const restoreSession = async () => {
             try {
                 // Использует общий refreshPromise из http.ts.
-                await refreshAccessToken();
+                const token = await refreshAccessToken();
 
-                if (active) {
-                    setTokenState(getAccessToken());
+                if (!active) {
+                    return;
+                }
+
+                setTokenState(token);
+
+                if (token) {
+                    await loadUserProfile();
+                } else {
+                    setUserName(null);
                 }
             } finally {
                 if (active) {
@@ -98,10 +139,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const saveSession = (data: AuthResponse) => {
+        profileRequestId.current++;
+        setUserName(null);
+
         updateAccessToken(
             data.accessToken,
             data.tokenType || 'Bearer',
         );
+        void loadUserProfile();
     };
 
     const logout = async (): Promise<void> => {
@@ -111,6 +156,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (error) {
             console.error('Backend logout failed:', error);
         } finally {
+            profileRequestId.current++;
+            setUserName(null);
             updateAccessToken(null);
             window.location.assign('/products');
         }
@@ -122,6 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isAuthenticated: Boolean(accessToken),
                 isLoading,
                 accessToken,
+                userName,
                 saveSession,
                 logout,
             }}

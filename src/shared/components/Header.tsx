@@ -4,7 +4,13 @@ import { useAuth } from '../../features/auth/context/AuthContext';
 import './header.css';
 
 export function Header() {
-    const { isAuthenticated, isLoading, logout } = useAuth();
+    const {
+        isAuthenticated,
+        isLoading,
+        userName,
+        logout,
+    } = useAuth();
+
     const [search, setSearch] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
@@ -50,6 +56,7 @@ export function Header() {
                     value={search}
                     onChange={event => setSearch(event.target.value)}
                 />
+
                 <button type="submit">Найти</button>
             </form>
 
@@ -63,15 +70,51 @@ export function Header() {
 
                 {!isLoading && (
                     isAuthenticated ? (
-                        <button
-                            type="button"
-                            onClick={() => void logout()}
-                        >
-                            Выйти
-                        </button>
+                        <>
+                            <div
+                                className="site-header__user"
+                                aria-label={
+                                    userName
+                                        ? `Пользователь: ${userName}`
+                                        : 'Пользователь'
+                                }
+                            >
+                                <span
+                                    className="site-header__avatar"
+                                    aria-hidden="true"
+                                >
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.7"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <circle cx="12" cy="8" r="4" />
+                                        <path d="M4 21a8 8 0 0 1 16 0" />
+                                    </svg>
+                                </span>
+
+                                {userName && (
+                                    <span className="site-header__user-name">
+                                        {userName}
+                                    </span>
+                                )}
+                            </div>
+
+                            <button
+                                type="button"
+                                className="site-header__logout"
+                                onClick={() => void logout()}
+                            >
+                                Выйти
+                            </button>
+                        </>
                     ) : (
                         <>
                             <Link to="/login">Войти</Link>
+
                             <Link
                                 to="/register"
                                 className="site-header__register"
@@ -84,5 +127,4 @@ export function Header() {
             </nav>
         </header>
     );
-
 }
