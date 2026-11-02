@@ -184,6 +184,16 @@
     color: #e8c99b;
 }
 /* Адаптивность */
+.site-header__admin {
+    color: #e8c99b;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+.site-header__admin:hover {
+    color: #fff;
+}
 
 @media (max-width: 900px) {
     .site-header {

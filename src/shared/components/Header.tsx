@@ -8,6 +8,7 @@ export function Header() {
         isAuthenticated,
         isLoading,
         userName,
+        userRole,
         logout,
     } = useAuth();
 
@@ -70,7 +71,11 @@ export function Header() {
 
                 {!isLoading && (
                     isAuthenticated ? (
-                        <>
+                        <>  {userRole === 'ADMIN' && (
+                            <Link to="/admin" className="site-header__admin">
+                                Администрирование
+                            </Link>
+                        )}
                             <div
                                 className="site-header__user"
                                 aria-label={

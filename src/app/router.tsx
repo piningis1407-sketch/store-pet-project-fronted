@@ -7,10 +7,12 @@ import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
 import UsersPage from '../features/users/pages/UsersPage';
 import UserDetailsPage from '../features/users/pages/UserDetailsPage';
-import ProtectedRoute from '../shared/components/ProtectedRoute';
 import { MainLayout } from '../shared/components/MainLayout';
 import { ProductsPage } from '../features/products/pages/ProductsPage';
 import { ProductDetailsPage } from '../features/products/pages/ProductDetailsPage';
+import AdminRoute from "../shared/components/AdminRoute";
+import AdminPage from "../features/admin/pages/AdminPage";
+
 
 export const router = createBrowserRouter([
     {
@@ -30,8 +32,12 @@ export const router = createBrowserRouter([
                 element: <ProductDetailsPage />,
             },
             {
-                element: <ProtectedRoute />,
+                element: <AdminRoute />,
                 children: [
+                    {
+                        path: 'admin',
+                        element: <AdminPage />,
+                    },
                     {
                         path: 'users',
                         element: <UsersPage />,

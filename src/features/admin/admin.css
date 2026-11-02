@@ -1,0 +1,41 @@
+.admin-page {
+    padding: 24px;
+    color: #29251f;
+}
+
+.admin-page h1 {
+    margin-bottom: 24px;
+}
+
+.admin-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #d8cbb8;
+}
+
+.admin-tabs button {
+    padding: 12px 20px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: #5d5143;
+    font: inherit;
+    cursor: pointer;
+}
+
+.admin-tabs button {
+    color: #29251f;
+    background: #f5eee3;
+}
+
+.admin-tabs button.active {
+    border-bottom-color: #c9a878;
+    color: #29251f;
+    font-weight: 600;
+}
+
+.admin-content {
+    overflow-x: auto;
+}

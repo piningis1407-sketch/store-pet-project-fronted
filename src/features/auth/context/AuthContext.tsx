@@ -8,7 +8,7 @@ import {
     type ReactNode,
 } from 'react';
 
-import type { AuthResponse } from '../types/auth.types';
+import type { AuthResponse, UserRole } from '../types/auth.types';
 import { authApi } from '../api/authApi';
 import {
     getAccessToken,
@@ -21,6 +21,7 @@ interface AuthContextValue {
     isLoading: boolean;
     accessToken: string | null;
     userName: string | null;
+    userRole: UserRole | null;
     saveSession: (data: AuthResponse) => void;
     logout: () => Promise<void>;
 }
@@ -32,6 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         () => getAccessToken(),
     );
     const [userName, setUserName] = useState<string | null>(null);
+    const [userRole, setUserRole] = useState<UserRole | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     // Не позволяем устаревшему запросу профиля восстановить имя
@@ -50,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (!token) {
             setUserName(null);
+            setUserRole(null);
             return;
         }
 
@@ -63,10 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 getAccessToken() !== null
             ) {
                 setUserName(profile.name);
+                setUserRole(profile.role);
             }
         } catch (error) {
             if (requestId === profileRequestId.current) {
                 setUserName(null);
+                setUserRole(null);
             }
 
             console.error('Failed to load user profile:', error);
@@ -86,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             profileRequestId.current++;
             setTokenState(null);
             setUserName(null);
+            setUserRole(null);
         };
 
         window.addEventListener(
@@ -141,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const saveSession = (data: AuthResponse) => {
         profileRequestId.current++;
         setUserName(null);
-
+        setUserRole(null);
         updateAccessToken(
             data.accessToken,
             data.tokenType || 'Bearer',
@@ -158,6 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } finally {
             profileRequestId.current++;
             setUserName(null);
+            setUserRole(null);
             updateAccessToken(null);
             window.location.assign('/products');
         }
@@ -170,6 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isLoading,
                 accessToken,
                 userName,
+                userRole,
                 saveSession,
                 logout,
             }}

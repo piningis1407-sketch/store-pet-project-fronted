@@ -14,7 +14,10 @@ export interface AuthResponse {
     tokenType: string;
 }
 
+export type UserRole = 'USER' | 'ADMIN';
+
 export interface UserProfileResponse {
     name: string;
     email: string;
+    role: UserRole;
 }
