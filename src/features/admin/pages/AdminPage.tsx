@@ -2,6 +2,7 @@ import { useState } from 'react';
 import AdminUsers from '../components/AdminUsers';
 import AdminProducts from '../components/AdminProducts';
 import '../admin.css';
+import AdminCategories from "../components/AdminCategories";
 
 type AdminTab = 'products' | 'categories' | 'users';
 
@@ -41,9 +42,7 @@ export default function AdminPage() {
             <section className="admin-content">
                 {activeTab === 'products' && <AdminProducts />}
 
-                {activeTab === 'categories' && (
-                    <p>Управление категориями — следующий этап подключения.</p>
-                )}
+                {activeTab === 'categories' && <AdminCategories />}
 
                 {activeTab === 'users' && <AdminUsers />}
             </section>

@@ -27,3 +27,23 @@ export function deactivateCategory(
         method: 'DELETE',
     });
 }
+
+export function getAdminCategories(): Promise<Category[]> {
+    return apiRequest<Category[]>('/api/categories/admin');
+}
+
+export function updateCategory(
+    id: number,
+    data: CategoryRequest
+): Promise<Category> {
+    return apiRequest<Category>(`/api/categories/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+}
+
+export function activateCategory(id: number): Promise<void> {
+    return apiRequest<void>(`/api/categories/${id}/activate`, {
+        method: 'PATCH',
+    });
+}

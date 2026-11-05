@@ -1,41 +1,327 @@
 .admin-page {
-    padding: 24px;
-    color: #29251f;
+    padding: 28px;
+    color: #382b21;
 }
 
 .admin-page h1 {
-    margin-bottom: 24px;
+    margin: 0 0 28px;
+    color: #493525;
+    font-size: 28px;
+    font-weight: 700;
 }
+
+.admin-content {
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.admin-content h2 {
+    margin: 0 0 20px;
+    color: #493525;
+    font-size: 21px;
+}
+
+/* Вкладки */
 
 .admin-tabs {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 24px;
+    gap: 8px;
+    margin-bottom: 26px;
     border-bottom: 1px solid #d8cbb8;
 }
 
 .admin-tabs button {
-    padding: 12px 20px;
+    padding: 11px 20px;
     border: none;
     border-bottom: 3px solid transparent;
+    border-radius: 7px 7px 0 0;
     background: transparent;
-    color: #5d5143;
+    color: #65452e;
     font: inherit;
+    font-weight: 600;
     cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
-.admin-tabs button {
-    color: #29251f;
-    background: #f5eee3;
+.admin-tabs button:hover {
+    background: #f0e7da;
 }
 
 .admin-tabs button.active {
-    border-bottom-color: #c9a878;
-    color: #29251f;
+    color: #fffaf2;
+    background: #65452e;
+    border-bottom-color: #c49a6c;
+}
+
+/* Разделы товаров и пользователей */
+
+.admin-products,
+.admin-users {
+    width: 100%;
+    min-width: 0;
+}
+
+.admin-products__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+}
+
+.admin-products__toolbar button,
+.admin-table__actions button,
+.admin-pagination button {
+    padding: 9px 15px;
+    border: 1px solid #bda78e;
+    border-radius: 7px;
+    background: #fffefa;
+    color: #65452e;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-products__toolbar button {
+    color: #fffaf2;
+    background: #65452e;
+    border-color: #65452e;
+}
+
+.admin-products__toolbar button:hover {
+    background: #49301f;
+    transform: translateY(-1px);
+}
+
+/* Общие таблицы */
+
+.admin-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    background: #fffefa;
+    border: 1px solid #e4d8c5;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(65, 45, 27, 0.06);
+}
+
+.admin-table th {
+    padding: 14px 16px;
+    background: #eee5d8;
+    color: #493525;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.admin-table td {
+    padding: 13px 16px;
+    color: #493f34;
+    font-size: 14px;
+    border-top: 1px solid #eee6da;
+    vertical-align: middle;
+}
+
+.admin-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.admin-table tbody tr:hover {
+    background: #faf5ec;
+}
+
+.admin-table th:first-child,
+.admin-table td:first-child {
+    padding-left: 18px;
+}
+
+
+.admin-table__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    width: 100%;
+}
+.admin-table__actions button:hover {
+    background: #eee5d8;
+    transform: translateY(-1px);
+}
+
+.admin-table__actions .admin-button--danger {
+    color: #963d32;
+    border-color: #dfb9b0;
+    background: #fff9f7;
+}
+
+.admin-table__actions .admin-button--danger:hover {
+    background: #f8e9e5;
+}
+
+.admin-table__actions .admin-button--primary {
+    color: #fffaf2;
+    background: #65452e;
+    border-color: #65452e;
+}
+
+.admin-table__actions .admin-button--primary:hover {
+    background: #49301f;
+}
+
+/* Статусы товаров */
+
+.admin-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.admin-status--active {
+    color: #356345;
+    background: #e7f1e8;
+}
+
+.admin-status--inactive {
+    color: #8b5145;
+    background: #f6e9e5;
+}
+
+/* Роли пользователей */
+
+.admin-role {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 6px;
+    color: #65452e;
+    background: #f0e7da;
+    font-size: 12px;
     font-weight: 600;
 }
 
-.admin-content {
-    overflow-x: auto;
+/* Ссылки */
+
+.admin-table__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    box-sizing: border-box;
+    vertical-align: middle;
+    color: #805a38;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+.admin-table__link:hover {
+    color: #49301f;
+    text-decoration: underline;
+}
+
+.admin-table th,
+.admin-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.admin-table td:nth-child(2) {
+    text-align: left;
+}
+
+/* Пагинация */
+.admin-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 22px;
+    color: #594431;
+    font-size: 14px;
+}
+
+.admin-pagination button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.admin-pagination button:not(:disabled):hover {
+    background: #eee5d8;
+}
+
+/* Сообщения */
+
+.admin-products [role="alert"],
+.admin-users [role="alert"] {
+    padding: 12px 14px;
+    color: #963d32;
+    background: #f8e9e5;
+    border: 1px solid #e8c5bd;
+    border-radius: 7px;
+}
+
+.admin-products > p,
+.admin-users > p {
+    color: #705e4b;
+}
+
+.admin-table__description {
+    max-width: 280px;
+    min-width: 180px;
+    color: #705e4b !important;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.admin-table--users {
+    width: 70%;
+    min-width: 650px;
+    margin: 0 auto;
+}
+
+.admin-table__email,
+.admin-table__category,
+.admin-table__description{
+    text-align: left !important;
+}
+/* Адаптивность */
+
+@media (max-width: 700px) {
+    .admin-page {
+        padding: 18px 12px;
+    }
+
+    .admin-page h1 {
+        font-size: 23px;
+    }
+
+    .admin-tabs {
+        gap: 4px;
+    }
+
+    .admin-tabs button {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .admin-content h2 {
+        font-size: 19px;
+    }
+
+    .admin-products__toolbar {
+        justify-content: flex-start;
+    }
+
+    .admin-pagination {
+        gap: 10px;
+        font-size: 13px;
+    }
 }

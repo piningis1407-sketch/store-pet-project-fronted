@@ -1,6 +1,9 @@
 export interface Category {
     id: number;
     name: string;
+    description: string | null;
+    active: boolean;
+    createdAt: string;
 }
 
 export interface Product {

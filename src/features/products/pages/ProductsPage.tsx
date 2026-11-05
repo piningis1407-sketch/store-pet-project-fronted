@@ -99,7 +99,7 @@ export function ProductsPage() {
 
             try {
                 const result = await getProducts({
-                    page: search ? 0 : page,
+                    page,
                     size: PAGE_SIZE,
                     sort,
                     ...(categoryId && /^\d+$/.test(categoryId)

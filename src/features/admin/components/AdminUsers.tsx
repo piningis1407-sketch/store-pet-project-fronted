@@ -38,19 +38,20 @@ export default function AdminUsers() {
     if (loading) return <p>Загрузка пользователей...</p>;
 
     return (
-        <section>
+        <section className="admin-users">
             <h2>Зарегистрированные пользователи</h2>
 
             {error && <p role="alert">{error}</p>}
 
             {!error && (
-                <table>
+                <table className="admin-table admin-table--users">
                     <thead>
                     <tr>
                         <th>ID</th>
                         <th>Имя</th>
                         <th>Email</th>
                         <th>Роль</th>
+                        <th>Дата регистрации</th>
                         <th>Действия</th>
                     </tr>
                     </thead>
@@ -60,20 +61,30 @@ export default function AdminUsers() {
                         <tr key={user.id}>
                             <td>{user.id}</td>
                             <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.role}</td>
+                            <td className="admin-table__email">{user.email}</td>
                             <td>
-                                <Link to={`/users/${user.id}`}>
-                                    Открыть
-                                </Link>
+                                <span className="admin-role">{user.role}</span>
+                            </td>
+                            <td>
+                                {new Date(user.createdAt).toLocaleDateString('ru-RU')}
+                            </td>
+                            <td>
+                                <div className="admin-table__actions">
+                                    <Link
+                                        to={`/users/${user.id}`}
+                                        className="admin-table__link"
+                                    >
+                                        Открыть
+                                    </Link>
 
-                                {' '}
-
-                                <button
-                                    onClick={() => handleDelete(user.id)}
-                                >
-                                    Удалить
-                                </button>
+                                    <button
+                                        type="button"
+                                        className="admin-button--danger"
+                                        onClick={() => handleDelete(user.id)}
+                                    >
+                                        Удалить
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}

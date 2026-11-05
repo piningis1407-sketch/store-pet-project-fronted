@@ -8,8 +8,8 @@ import {
     updateProduct,
 } from '../../products/api/productApi';
 import type { ProductRequest } from '../../products/api/productApi';
-
 import { getCategories } from '../../products/api/categoriesApi';
+import '../admin-product-form.css';
 
 import type {
     Product,
@@ -40,8 +40,11 @@ export default function AdminProducts() {
     const [saving, setSaving] = useState(false);
     const [categoriesError, setCategoriesError] = useState('');
 
-    const loadProducts = useCallback(async () => {
-        setLoading(true);
+    const loadProducts = useCallback(async (showLoader = true) => {
+        if (showLoader) {
+            setLoading(true);
+        }
+
         setError('');
 
         try {
@@ -59,7 +62,9 @@ export default function AdminProducts() {
                     : 'Не удалось загрузить товары',
             );
         } finally {
-            setLoading(false);
+            if (showLoader) {
+                setLoading(false);
+            }
         }
     }, [page]);
 
@@ -98,7 +103,7 @@ export default function AdminProducts() {
             if (data && data.content.length === 1 && page > 0) {
                 setPage(current => current - 1);
             } else {
-                await loadProducts();
+                await loadProducts(false);
             }
         } catch (err: unknown) {
             setError(
@@ -192,11 +197,21 @@ export default function AdminProducts() {
                     Добавить товар
                 </button>
             </div>
+
+            {data && (
+                <p>Всего товаров: {data.totalElements}</p>
+            )}
+
+            {loading && <p>Загрузка товаров...</p>}
+
+            {error && <p role="alert">{error}</p>}
+
             {showForm && (
-                <form
-                    className="admin-product-form"
-                    onSubmit={handleSubmit}
-                >
+                <div className="admin-product-modal">
+                    <form
+                        className="admin-product-form"
+                        onSubmit={handleSubmit}
+                    >
                     <h3>
                         {editingProductId === null
                             ? 'Создание товара'
@@ -291,25 +306,20 @@ export default function AdminProducts() {
                         </button>
                     </div>
                 </form>
+                </div>
             )}
-            {data && (
-                <p>Всего товаров: {data.totalElements}</p>
-            )}
-
-            {loading && <p>Загрузка товаров...</p>}
-
-            {error && <p role="alert">{error}</p>}
 
             {!loading && data && (
                 <>
                     {data.empty ? (
                         <p>Активных товаров пока нет.</p>
                     ) : (
-                        <table>
+                        <table className="admin-table">
                             <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Название</th>
+                                <th>Описание</th>
                                 <th>Категория</th>
                                 <th>Цена</th>
                                 <th>Остаток</th>
@@ -323,31 +333,46 @@ export default function AdminProducts() {
                                 <tr key={product.id}>
                                     <td>{product.id}</td>
                                     <td>{product.name}</td>
-                                    <td>
-                                        {product.category?.name ?? '—'}
+                                    <td className="admin-table__description">
+                                        {product.description || '—'}
+                                    </td>
+                                    <td className="admin-table__category">
+                                        {product.category?.name || '—'}
                                     </td>
                                     <td>
                                         {product.price.toFixed(2)}
                                     </td>
                                     <td>{product.stockQuantity}</td>
                                     <td>
-                                        {product.active ? 'Активен' : 'Неактивен'}
+                                        <span className={`admin-status ${
+                                            product.active
+                                                ? 'admin-status--active'
+                                                : 'admin-status--inactive'
+                                        }`}>
+                                            {product.active ? 'Активен' : 'Неактивен'}
+                                        </span>
                                     </td>
                                     <td>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleEdit(product)}
-                                        >
-                                            Редактировать
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button
-                                            type="button"
-                                            onClick={() => void handleToggleActive(product)}
-                                        >
-                                            {product.active ? 'Деактивировать' : 'Активировать'}
-                                        </button>
+                                        <div className="admin-table__actions">
+                                            <button
+                                                type="button"
+                                                className="admin-button--primary"
+                                                onClick={() => handleEdit(product)}
+                                            >
+                                                Редактировать
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                className={product.active
+                                                    ? 'admin-button--danger'
+                                                    : 'admin-button--primary'
+                                                }
+                                                onClick={() => void handleToggleActive(product)}
+                                            >
+                                                {product.active ? 'Деактивировать' : 'Активировать'}
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
