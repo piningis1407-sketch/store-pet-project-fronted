@@ -12,6 +12,7 @@ import { ProductsPage } from '../features/products/pages/ProductsPage';
 import { ProductDetailsPage } from '../features/products/pages/ProductDetailsPage';
 import AdminRoute from "../shared/components/AdminRoute";
 import AdminPage from "../features/admin/pages/AdminPage";
+import CartPage from "../features/cart/pages/CartPage";
 
 
 export const router = createBrowserRouter([
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
             {
                 path: 'products/:id',
                 element: <ProductDetailsPage />,
+            },
+            {
+                path: 'cart',
+                element: <CartPage />,
             },
             {
                 element: <AdminRoute />,

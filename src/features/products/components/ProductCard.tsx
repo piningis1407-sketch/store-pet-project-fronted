@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Product } from '../types/product';
 import { Link,  useLocation  } from 'react-router-dom';
+import {useCart} from "../../cart/context/CartContext";
 
 interface ProductCardProps {
     product: Product;
@@ -15,6 +16,14 @@ const priceFormatter = new Intl.NumberFormat('ru-RU', {
 export function ProductCard({ product }: ProductCardProps) {
     const [imageError, setImageError] = useState(false);
     const location = useLocation();
+    const { addItem } = useCart();
+    const [added, setAdded] = useState(false);
+
+    function handleAddToCart() {
+        addItem(product);
+        setAdded(true);
+    }
+
     const hasImage = Boolean(product.imageUrl) && !imageError;
     const inStock = product.stockQuantity > 0;
     const currentCatalogUrl = location.pathname + location.search;
@@ -86,6 +95,14 @@ export function ProductCard({ product }: ProductCardProps) {
                     </div>
                 </div>
             </Link>
+            <button
+                type="button"
+                className="product-card__add-to-cart"
+                onClick={handleAddToCart}
+                disabled={!inStock}
+            >
+                {!inStock ? 'Нет в наличии' : added ? 'Добавлено' : 'В корзину'}
+            </button>
         </article>
     );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import './header.css';
+import {useCart} from "../../features/cart/context/CartContext";
 
 export function Header() {
     const {
@@ -11,6 +12,7 @@ export function Header() {
         userRole,
         logout,
     } = useAuth();
+    const { totalItems } = useCart();
 
     const [search, setSearch] = useState('');
     const navigate = useNavigate();
@@ -68,7 +70,14 @@ export function Header() {
                 <button type="button" onClick={openCatalog}>
                     Каталог
                 </button>
-
+                <Link to="/cart" className="site-header__cart">
+                    Корзина
+                    {totalItems > 0 && (
+                        <span className="site-header__cart-count">
+                            {totalItems}
+                        </span>
+                    )}
+                </Link>
                 {!isLoading && (
                     isAuthenticated ? (
                         <>  {userRole === 'ADMIN' && (

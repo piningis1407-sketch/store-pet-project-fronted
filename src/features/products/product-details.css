@@ -164,6 +164,30 @@
 .product-details button.product-details__catalog-link:active {
     transform: none;
 }
+/*корзина*/
+.product-details__add-to-cart {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin-top: 20px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #8b5e3c;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.product-details__add-to-cart:hover:not(:disabled) {
+    background: #70482e;
+}
+
+.product-details__add-to-cart:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
 @media (max-width: 760px) {
     .product-details__layout {
         grid-template-columns: 1fr;

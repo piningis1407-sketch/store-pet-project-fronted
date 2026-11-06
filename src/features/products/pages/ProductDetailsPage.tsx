@@ -4,6 +4,7 @@ import { getProductById } from '../api/productApi';
 import type { Product } from '../types/product';
 import { getRussianErrorMessage } from '../../../shared/api/errorMessages';
 import '../product-details.css';
+import {useCart} from "../../cart/context/CartContext";
 
 
 
@@ -17,6 +18,8 @@ export function ProductDetailsPage() {
     const { id } = useParams<{ id: string }>();
     const location = useLocation();
     const navigate = useNavigate();
+    const { addItem } = useCart();
+    const [added, setAdded] = useState(false);
 
     const returnTo =
         (location.state as { from?: string } | null)?.from ?? '/products';
@@ -182,7 +185,17 @@ export function ProductDetailsPage() {
                     <p className="product-details__meta">
                         Артикул: {product.id}
                     </p>
-
+                    <button
+                        type="button"
+                        className="product-details__add-to-cart"
+                        onClick={() => {
+                            addItem(product);
+                            setAdded(true);
+                        }}
+                        disabled={!inStock}
+                    >
+                        {!inStock ? 'Нет в наличии' : added ? 'Добавлено' : 'В корзину'}
+                    </button>
                     <button
                         type="button"
                         className="product-details__catalog-link"

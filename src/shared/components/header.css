@@ -183,7 +183,7 @@
 .site-header__nav button.site-header__logout:hover {
     color: #e8c99b;
 }
-/* Адаптивность */
+
 .site-header__admin {
     color: #e8c99b;
     text-decoration: none;
@@ -194,7 +194,28 @@
 .site-header__admin:hover {
     color: #fff;
 }
+/*корзина */
+.site-header__cart {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+}
 
+.site-header__cart-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 50%;
+    background: #8b5e3c;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+}
+/* Адаптивность */
 @media (max-width: 900px) {
     .site-header {
         gap: 16px;
