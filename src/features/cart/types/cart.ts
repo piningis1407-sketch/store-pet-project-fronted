@@ -1,4 +1,4 @@
-import {Product} from "../../products/types/product";
+import type {Product} from "../../products/types/product";
 
 
 export interface CartItem {
@@ -14,8 +14,8 @@ export interface CartContextType {
     items: CartItem[];
     totalItems: number;
     totalPrice: number;
-    addItem: (product: Product) => void;
-    removeItem: (productId: number) => void;
-    updateQuantity: (productId: number, quantity: number) => void;
-    clearCart: () => void;
+    addItem: (product: Product) => Promise<void>;
+    removeItem: (productId: number) => Promise<void>;
+    updateQuantity: (productId: number, quantity: number) => Promise<void>;
+    clearCart: () => Promise<void>;
 }
