@@ -78,6 +78,11 @@ export function Header() {
                         </span>
                     )}
                 </Link>
+                {!isLoading && isAuthenticated && (
+                    <Link to="/orders" className="site-header__orders">
+                        Мои заказы
+                    </Link>
+                )}
                 {!isLoading && (
                     isAuthenticated ? (
                         <>  {userRole === 'ADMIN' && (

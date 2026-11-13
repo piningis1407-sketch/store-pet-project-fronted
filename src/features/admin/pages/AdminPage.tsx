@@ -3,8 +3,9 @@ import AdminUsers from '../components/AdminUsers';
 import AdminProducts from '../components/AdminProducts';
 import '../admin.css';
 import AdminCategories from "../components/AdminCategories";
+import AdminOrders from "../components/AdminOrders";
 
-type AdminTab = 'products' | 'categories' | 'users';
+type AdminTab = 'products' | 'categories' | 'users'| 'orders';
 
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<AdminTab>('products');
@@ -37,6 +38,13 @@ export default function AdminPage() {
                 >
                     Пользователи
                 </button>
+                <button
+                    type="button"
+                    className={activeTab === 'orders' ? 'active' : ''}
+                    onClick={() => setActiveTab('orders')}
+                >
+                    Заказы
+                </button>
             </nav>
 
             <section className="admin-content">
@@ -45,6 +53,8 @@ export default function AdminPage() {
                 {activeTab === 'categories' && <AdminCategories />}
 
                 {activeTab === 'users' && <AdminUsers />}
+
+                {activeTab === 'orders' && <AdminOrders />}
             </section>
         </main>
     );

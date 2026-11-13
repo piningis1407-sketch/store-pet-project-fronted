@@ -13,6 +13,10 @@ import { ProductDetailsPage } from '../features/products/pages/ProductDetailsPag
 import AdminRoute from "../shared/components/AdminRoute";
 import AdminPage from "../features/admin/pages/AdminPage";
 import CartPage from "../features/cart/pages/CartPage";
+import ProtectedRoute from "../shared/components/ProtectedRoute";
+import CheckoutPage from '../features/orders/pages/CheckoutPage';
+import OrdersPage from "../features/orders/pages/OrdersPage";
+import OrderDetailsPage from "../features/orders/pages/OrderDetailsPage";
 
 
 export const router = createBrowserRouter([
@@ -35,6 +39,23 @@ export const router = createBrowserRouter([
             {
                 path: 'cart',
                 element: <CartPage />,
+            },
+            {
+                element: <ProtectedRoute />,
+                children: [
+                    {
+                        path: 'checkout',
+                        element: <CheckoutPage />,
+                    },
+                    {
+                        path: 'orders',
+                        element: <OrdersPage />,
+                    },
+                    {
+                        path: 'orders/:id',
+                        element: <OrderDetailsPage />,
+                    },
+                ],
             },
             {
                 element: <AdminRoute />,

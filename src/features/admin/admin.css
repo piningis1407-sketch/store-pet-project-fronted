@@ -292,6 +292,94 @@
 .admin-table__description{
     text-align: left !important;
 }
+
+/*фильтр статусов */
+.admin-orders__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.admin-orders__toolbar label {
+    font-weight: 500;
+    color: #333;
+}
+
+.admin-orders__toolbar select {
+    min-width: 190px;
+    padding: 9px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #333;
+    font: inherit;
+    cursor: pointer;
+}
+
+.admin-orders__toolbar select:focus {
+    outline: none;
+    border-color: #8b6b4a;
+    box-shadow: 0 0 0 2px rgb(139 107 74 / 15%);
+}
+
+/* стили изменения статусов в таблице*/
+.admin-order-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.admin-order-status span {
+    font-weight: 500;
+}
+
+.admin-order-status select {
+    min-width: 150px;
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #333;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.admin-order-status select:focus {
+    outline: none;
+    border-color: #8b6b4a;
+    box-shadow: 0 0 0 2px rgb(139 107 74 / 15%);
+}
+
+.admin-order-status select:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+
+
+.admin-orders__status-column {
+    text-align: center;
+}
+
+.admin-order-status {
+    align-items: center;
+}
+
+.admin-orders .admin-order-status span {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: normal;
+    color: #555;
+}
+
+.admin-orders .admin-table th.admin-orders__date-column,
+.admin-orders .admin-table td.admin-orders__date-column {
+    text-align: center;
+}
 /* Адаптивность */
 
 @media (max-width: 700px) {

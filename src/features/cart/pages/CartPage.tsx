@@ -148,13 +148,12 @@ export default function CartPage() {
                         Очистить корзину
                     </button>
 
-                    <button
-                        type="button"
+                    <Link
+                        to="/checkout"
                         className="cart-summary__checkout"
-                        disabled
                     >
                         Оформить заказ
-                    </button>
+                    </Link>
 
                     <Link
                         to="/products"
